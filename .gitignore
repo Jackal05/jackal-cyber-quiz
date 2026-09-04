@@ -1,0 +1,35 @@
+node_modules/
+dist/
+build/
+.next/
+out/
+.netlify/
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+!.env.example
+
+# Logs and databases
+*.log
+*.sqlite
+*.sqlite3
+*.sqlite-*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Testing
+coverage/
+
+# Temporary
+.temp/
+.tmp/
