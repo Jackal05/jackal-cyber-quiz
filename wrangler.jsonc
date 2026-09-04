@@ -1,4 +1,3 @@
-// Deployment retrigger: 2026-09-03
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "jacka-cyber-quiz",
@@ -17,10 +16,10 @@
       }
     ]
   },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["MatchDO"]
+  "exports": {
+    "MatchDO": {
+      "type": "durable-object",
+      "storage": "sqlite"
     }
-  ]
+  }
 }
