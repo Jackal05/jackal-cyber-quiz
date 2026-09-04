@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext.jsx";
 import { useBattleSocket } from "../../context/BattleSocketContext.jsx";
 import { BATTLE_MODES } from "../../config/constants.js";
 import RankBadge from "../common/RankBadge.jsx";
-import { Swords, Trophy, History, Target, Flame, Clock, Radio, ChevronRight, Zap } from "lucide-react";
+import { Swords, Trophy, History, Target, Flame, Clock, Radio, ChevronRight, Zap, ShieldCheck, Network, Fingerprint, Crosshair, Activity } from "lucide-react";
 
 export default function BattleLobby({ onFindOpponent, onViewHistory, onViewLeaderboard }) {
   const { user } = useAuth();
@@ -11,138 +11,108 @@ export default function BattleLobby({ onFindOpponent, onViewHistory, onViewLeade
   const [selectedMode, setSelectedMode] = useState("ciberseguridad");
 
   const winRate = user?.battles_played > 0 ? Math.round((user.wins / user.battles_played) * 100) : 0;
-  const avgResponseTime = user?.total_questions > 0
-    ? (user.total_response_time_ms / user.total_questions / 1000).toFixed(1)
-    : "0.0";
+  const avgResponseTime = user?.total_questions > 0 ? (user.total_response_time_ms / user.total_questions / 1000).toFixed(1) : "0.0";
   const selected = BATTLE_MODES.find((mode) => mode.id === selectedMode) || BATTLE_MODES[0];
 
+  const iconFor = (id) => id === "redes" ? Network : id === "forense" ? Fingerprint : ShieldCheck;
+  const accentFor = (id) => id === "redes" ? "sky" : id === "forense" ? "amber" : "emerald";
+
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-300">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-zinc-800/80 pb-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-black tracking-widest text-emerald-400 uppercase mb-3">
-            <Radio size={13} className="animate-pulse" /> Arena competitiva 1v1
+    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
+      <section className="cyber-panel cyber-grid-surface rounded-[26px] p-6 sm:p-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+          <div>
+            <div className="cyber-kicker"><Radio size={12} className="animate-pulse" /> live combat network</div>
+            <h1 className="text-4xl sm:text-5xl font-black text-white tracking-[-.04em] mt-3">BATTLE <span className="text-emerald-300 cyber-glow-text">1v1</span></h1>
+            <p className="text-sm text-zinc-400 mt-3 max-w-2xl">Matchmaking competitivo en tiempo real. Cinco rondas, puntuación autoritativa y especialidades técnicas separadas.</p>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
-            BATTLE <span className="text-emerald-400">LOBBY</span>
-          </h1>
-          <p className="text-sm text-zinc-400 mt-2 max-w-2xl">
-            Elige tu especialidad y compite contra otro analista en 5 rondas en tiempo real. La precisión y la velocidad determinan la puntuación.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
-          </span>
-          <span className="font-bold text-white">{onlineCount}</span> analistas en línea
-        </div>
-      </div>
-
-      <div className="grid lg:grid-cols-12 gap-8">
-        <section className="lg:col-span-4 rounded-2xl border border-zinc-800 bg-[#090d0a] p-6 shadow-xl">
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-emerald-300/[.10] bg-black/25">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-300 cyber-status-dot" />
             <div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Operador activo</span>
-              <h2 className="text-2xl font-black text-white mt-1">{user?.username || "Analyst"}</h2>
-              <p className="text-xs text-zinc-400 mt-1">Nivel {user?.level || 1} · {user?.xp || 0} XP</p>
+              <div className="cyber-mono text-[8px] uppercase tracking-[.14em] text-zinc-600">analyst nodes online</div>
+              <div className="text-lg font-black text-white">{onlineCount}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid xl:grid-cols-12 gap-6">
+        <aside className="xl:col-span-4 cyber-panel rounded-2xl p-6">
+          <div className="flex items-start justify-between gap-4 pb-5 border-b cyber-divider">
+            <div>
+              <div className="cyber-kicker"><Activity size={12} /> combat profile</div>
+              <h2 className="text-2xl font-black text-white mt-2">{user?.username || "Analyst"}</h2>
+              <div className="cyber-mono text-[9px] text-zinc-600 mt-1 uppercase tracking-wider">level {user?.level || 1} · {user?.xp || 0} xp</div>
             </div>
             <RankBadge rank={user?.rank} size="md" />
           </div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4 mb-5">
-            <span className="text-[10px] uppercase tracking-wider font-black text-zinc-500">Rating competitivo</span>
-            <div className="text-3xl font-black text-white mt-1">{user?.rating || 1200} <span className="text-xs text-emerald-400">MMR</span></div>
+          <div className="grid grid-cols-2 gap-3 mt-5">
+            <BattleStat label="MMR" value={user?.rating || 1200} icon={Target} />
+            <BattleStat label="WIN RATE" value={`${winRate}%`} icon={Crosshair} />
+            <BattleStat label="STREAK" value={user?.current_streak || 0} icon={Flame} accent="text-amber-300" />
+            <BattleStat label="AVG TIME" value={`${avgResponseTime}s`} icon={Clock} accent="text-sky-300" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Stat icon={Swords} label="Batallas" value={user?.battles_played || 0} />
-            <Stat icon={Target} label="Win rate" value={`${winRate}%`} />
-            <Stat icon={Flame} label="Racha" value={user?.current_streak || 0} accent="text-amber-300" />
-            <Stat icon={Clock} label="Vel. media" value={`${avgResponseTime}s`} accent="text-sky-300" />
+          <div className="grid grid-cols-2 gap-2.5 mt-6 pt-5 border-t cyber-divider">
+            <button onClick={onViewLeaderboard} className="h-10 rounded-lg border border-emerald-300/[.08] bg-black/20 hover:border-emerald-300/20 text-zinc-400 text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2"><Trophy size={13} className="text-amber-300" /> Ranking</button>
+            <button onClick={onViewHistory} className="h-10 rounded-lg border border-emerald-300/[.08] bg-black/20 hover:border-emerald-300/20 text-zinc-400 text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2"><History size={13} className="text-emerald-300" /> Intel Log</button>
           </div>
+        </aside>
 
-          <div className="grid grid-cols-2 gap-2.5 mt-6 pt-5 border-t border-zinc-900">
-            <button onClick={onViewLeaderboard} className="h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold flex items-center justify-center gap-2">
-              <Trophy size={14} className="text-amber-400" /> Leaderboard
-            </button>
-            <button onClick={onViewHistory} className="h-10 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-bold flex items-center justify-center gap-2">
-              <History size={14} className="text-emerald-400" /> Historial
-            </button>
-          </div>
-        </section>
-
-        <section className="lg:col-span-8 rounded-2xl border border-zinc-800 bg-[#090d0a] p-6 shadow-xl">
-          <div className="flex items-center justify-between gap-4 mb-5">
+        <section className="xl:col-span-8 cyber-panel rounded-2xl p-6">
+          <div className="flex items-start justify-between gap-4 mb-5">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Selecciona módulo</p>
-              <h2 className="text-xl font-black text-white mt-1">Especialidad de la batalla</h2>
+              <div className="cyber-kicker"><Swords size={12} /> select combat module</div>
+              <h2 className="text-2xl font-black text-white mt-2">Choose your discipline</h2>
             </div>
-            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-400/10 border border-emerald-400/20 text-emerald-400">3 MODOS ACTIVOS</span>
+            <span className="cyber-mono text-[8px] font-black px-2.5 py-1 rounded-md border border-emerald-300/20 bg-emerald-300/[.06] text-emerald-300 tracking-wider">3 MODULES ACTIVE</span>
           </div>
 
           <div className="grid md:grid-cols-3 gap-3">
             {BATTLE_MODES.map((mode) => {
+              const Icon = iconFor(mode.id);
+              const accent = accentFor(mode.id);
               const isSelected = selectedMode === mode.id;
+              const selectedClasses = accent === "sky" ? "border-sky-300/45 bg-sky-300/[.055] shadow-[0_0_26px_rgba(56,215,255,.06)]" : accent === "amber" ? "border-amber-300/45 bg-amber-300/[.05] shadow-[0_0_26px_rgba(248,196,92,.05)]" : "border-emerald-300/45 bg-emerald-300/[.055] shadow-[0_0_26px_rgba(80,245,165,.06)]";
+              const iconClasses = accent === "sky" ? "text-sky-300 border-sky-300/15 bg-sky-300/[.04]" : accent === "amber" ? "text-amber-300 border-amber-300/15 bg-amber-300/[.04]" : "text-emerald-300 border-emerald-300/15 bg-emerald-300/[.04]";
               return (
-                <button
-                  key={mode.id}
-                  onClick={() => setSelectedMode(mode.id)}
-                  className={`text-left p-5 rounded-xl border transition-all min-h-[170px] ${
-                    isSelected
-                      ? "border-emerald-400 bg-emerald-500/[.07] shadow-[0_0_24px_rgba(52,211,153,.08)]"
-                      : "border-zinc-800 bg-zinc-950/70 hover:border-zinc-700"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className={`h-5 w-5 rounded-full border grid place-items-center ${isSelected ? "border-emerald-400 bg-emerald-400" : "border-zinc-700"}`}>
-                      {isSelected && <span className="h-2 w-2 rounded-full bg-black" />}
-                    </span>
-                    <span className="text-[9px] font-black px-2 py-0.5 rounded bg-emerald-400 text-black">1v1 RANKED</span>
+                <button key={mode.id} onClick={() => setSelectedMode(mode.id)} className={`text-left p-5 rounded-xl border transition-all min-h-[190px] relative overflow-hidden ${isSelected ? selectedClasses : "border-emerald-300/[.08] bg-black/20 hover:border-emerald-300/18"}`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className={`h-11 w-11 rounded-xl border grid place-items-center ${iconClasses}`}><Icon size={19} /></div>
+                    <span className="cyber-mono text-[8px] text-zinc-600 tracking-[.12em]">{mode.id.toUpperCase()}</span>
                   </div>
-                  <h3 className="text-base font-black text-white">{mode.title}</h3>
-                  <p className="text-xs text-zinc-400 leading-relaxed mt-2">{mode.description}</p>
+                  <h3 className="text-base font-black text-white mt-5">{mode.title}</h3>
+                  <p className="text-xs text-zinc-500 leading-relaxed mt-2">{mode.description}</p>
+                  <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between cyber-mono text-[8px] text-zinc-700 uppercase tracking-wider"><span>ranked</span><span>{isSelected ? "selected" : "standby"}</span></div>
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-950/70 p-4">
-            <div className="flex items-center gap-2 text-xs font-bold text-zinc-300 mb-3">
-              <Zap size={14} className="text-emerald-400" /> Reglas del duelo
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] text-zinc-400">
-              <div><span className="block text-zinc-500">Módulo</span>{selected.title}</div>
-              <div><span className="block text-zinc-500">Rondas</span>5 preguntas</div>
-              <div><span className="block text-zinc-500">Tiempo</span>20s por pregunta</div>
-              <div><span className="block text-zinc-500">Empate</span>Muerte súbita</div>
+          <div className="mt-5 rounded-xl border border-emerald-300/[.08] bg-black/20 p-4">
+            <div className="cyber-kicker"><Zap size={12} /> engagement protocol</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
+              <Rule label="MODULE" value={selected.title} />
+              <Rule label="ROUNDS" value="5 QUESTIONS" />
+              <Rule label="TIME" value="20S / ROUND" />
+              <Rule label="TIE" value="SUDDEN DEATH" />
             </div>
           </div>
 
-          <div className="mt-7 pt-6 border-t border-zinc-800">
-            <button
-              onClick={() => onFindOpponent(selectedMode)}
-              className="w-full h-14 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-black text-base flex items-center justify-center gap-3 transition-all active:scale-[0.99] shadow-[0_0_30px_rgba(52,211,153,.22)]"
-            >
-              <Swords size={20} className="stroke-[2.5]" />
-              BUSCAR OPONENTE · {selected.title.toUpperCase()}
-              <ChevronRight size={18} />
-            </button>
-          </div>
+          <button onClick={() => onFindOpponent(selectedMode)} className="w-full h-14 mt-6 rounded-xl bg-emerald-300 hover:bg-emerald-200 text-[#021008] font-black text-sm flex items-center justify-center gap-3 transition-all active:scale-[.99] shadow-[0_0_32px_rgba(80,245,165,.15)]">
+            <Crosshair size={19} /> INITIATE MATCHMAKING · {selected.title.toUpperCase()} <ChevronRight size={17} />
+          </button>
         </section>
       </div>
     </div>
   );
 }
 
-function Stat({ icon: Icon, label, value, accent = "text-white" }) {
-  return (
-    <div className="p-3.5 rounded-xl bg-zinc-950/60 border border-zinc-900">
-      <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold mb-1">
-        <Icon size={14} className="text-emerald-400" /> {label}
-      </div>
-      <div className={`text-lg font-black ${accent}`}>{value}</div>
-    </div>
-  );
+function BattleStat({ label, value, icon: Icon, accent = "text-white" }) {
+  return <div className="cyber-card rounded-xl p-4"><div className="flex items-center justify-between"><span className="cyber-mono text-[8px] text-zinc-600 tracking-wider">{label}</span><Icon size={13} className="text-emerald-300" /></div><div className={`text-xl font-black mt-3 ${accent}`}>{value}</div></div>;
+}
+
+function Rule({ label, value }) {
+  return <div><div className="cyber-mono text-[8px] uppercase tracking-[.12em] text-zinc-700">{label}</div><div className="text-[11px] font-black text-zinc-300 mt-1">{value}</div></div>;
 }

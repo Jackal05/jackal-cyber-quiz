@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Trophy,
   ShieldCheck,
-  Zap,
   Target,
   Clock,
   ArrowRight,
@@ -15,7 +14,12 @@ import {
   AlertTriangle,
   History,
   Radio,
-  ExternalLink,
+  Activity,
+  Network,
+  Fingerprint,
+  Crosshair,
+  Gauge,
+  Server,
 } from "lucide-react";
 
 export default function DashboardView({ onNavigate, onPracticeTopic }) {
@@ -26,7 +30,6 @@ export default function DashboardView({ onNavigate, onPracticeTopic }) {
 
   useEffect(() => {
     if (user?.username) {
-      // Fetch profile stats
       fetch(`/api/profile/${encodeURIComponent(user.username)}`)
         .then((res) => res.json())
         .then((data) => {
@@ -34,242 +37,238 @@ export default function DashboardView({ onNavigate, onPracticeTopic }) {
         })
         .catch(() => {});
 
-      // Fetch recent match
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       fetch(`/api/battle/history?userId=${user.id}`, { headers })
         .then((res) => res.json())
         .then((data) => {
-          if (data.matches && data.matches.length > 0) {
-            setRecentMatch(data.matches[0]);
-          }
+          if (data.matches && data.matches.length > 0) setRecentMatch(data.matches[0]);
         })
         .catch(() => {});
     }
   }, [user?.username, user?.id, token]);
 
-  // Determine weakest category
   const weakestArea = categoryStats.length > 0
-    ? [...categoryStats].sort((a, b) => (a.correct_count / (a.total_count || 1)) - (b.correct_count / (b.total_count || 1)))[0]
+    ? [...categoryStats].sort(
+        (a, b) =>
+          a.correct_count / (a.total_count || 1) -
+          b.correct_count / (b.total_count || 1)
+      )[0]
     : null;
 
   const winRate = user?.battles_played > 0 ? Math.round((user.wins / user.battles_played) * 100) : 0;
 
+  const tracks = [
+    {
+      id: "ciberseguridad",
+      title: "Ciberseguridad",
+      code: "CYB-01",
+      sub: "Threats · Defense · Incident Response",
+      icon: ShieldCheck,
+      accent: "emerald",
+    },
+    {
+      id: "redes",
+      title: "Redes",
+      code: "NET-02",
+      sub: "Routing · Switching · Protocol Analysis",
+      icon: Network,
+      accent: "cyan",
+    },
+    {
+      id: "forense",
+      title: "Informática Forense",
+      code: "FOR-03",
+      sub: "Evidence · Memory · Digital Artifacts",
+      icon: Fingerprint,
+      accent: "amber",
+    },
+  ];
+
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-300">
-      {/* Brand Hero Narrative */}
-      <section className="relative rounded-3xl border border-zinc-800 bg-gradient-to-b from-[#090f0b] to-[#060807] p-8 sm:p-12 overflow-hidden shadow-2xl">
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs font-black text-emerald-400 tracking-wider uppercase">
-            <Radio size={13} className="animate-pulse" /> Jackal Cybersecurity Proving Ground
+    <div className="max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300">
+      <section className="cyber-panel cyber-grid-surface rounded-[26px] p-6 sm:p-8 lg:p-10 min-h-[300px] flex items-center">
+        <div className="absolute inset-y-0 right-0 w-[42%] opacity-20 cyber-noise pointer-events-none" />
+        <div className="absolute right-8 top-8 hidden lg:flex items-center gap-2 cyber-mono text-[9px] uppercase tracking-[.16em] text-zinc-600">
+          <span className="h-2 w-2 rounded-full bg-emerald-300 cyber-status-dot" />
+          command uplink stable
+        </div>
+
+        <div className="relative z-10 grid lg:grid-cols-[1.3fr_.7fr] gap-8 w-full items-end">
+          <div className="max-w-3xl">
+            <div className="cyber-kicker mb-4">
+              <Radio size={13} className="animate-pulse" /> Jackal cyber command
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-[-.045em] leading-[.98] cyber-glow-text">
+              Train like an analyst.
+              <span className="block text-emerald-300">Operate under pressure.</span>
+            </h1>
+            <p className="mt-5 text-sm sm:text-base text-zinc-400 leading-relaxed max-w-2xl">
+              Laboratorio técnico, inteligencia de rendimiento y duelos 1v1 en tiempo real para validar criterio en ciberseguridad, redes e informática forense.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 mt-7">
+              <button
+                onClick={() => onNavigate("battle")}
+                className="h-12 px-6 rounded-xl bg-emerald-300 hover:bg-emerald-200 text-[#031008] font-black text-xs tracking-wide flex items-center justify-center gap-2.5 shadow-[0_0_28px_rgba(80,245,165,.16)] transition-all active:scale-[.99]"
+              >
+                <Crosshair size={17} /> ENTER 1v1 ARENA <ArrowRight size={15} />
+              </button>
+              <button
+                onClick={() => onNavigate("training")}
+                className="h-12 px-6 rounded-xl border border-emerald-300/15 bg-black/25 hover:border-emerald-300/30 text-zinc-200 font-bold text-xs tracking-wide flex items-center justify-center gap-2 transition-colors"
+              >
+                <GraduationCap size={17} className="text-emerald-300" /> OPEN TRAINING LAB
+              </button>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-[1.08]">
-            Master cybersecurity. <br />
-            <span className="text-emerald-400">Then prove it.</span>
-          </h1>
-
-          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-xl">
-            Entrena con desafíos técnicos de certificación profesional y compite contra otros operadores en duelos 1v1 en tiempo real con puntuación autoritativa.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-4">
-            <button
-              onClick={() => onNavigate("battle")}
-              className="h-12 px-7 rounded-xl bg-emerald-400 hover:bg-emerald-300 text-black font-black text-sm flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.99] shadow-[0_0_24px_rgba(52,211,153,.25)] cursor-pointer"
-            >
-              <Swords size={18} className="stroke-[2.5]" />
-              ENTER BATTLE 1v1
-            </button>
-
-            <button
-              onClick={() => onNavigate("training")}
-              className="h-12 px-7 rounded-xl border border-zinc-700 bg-zinc-900/80 hover:bg-zinc-800 text-white font-bold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
-            >
-              <GraduationCap size={18} className="text-emerald-400" />
-              START TRAINING
-            </button>
+          <div className="grid grid-cols-2 gap-3 lg:max-w-sm lg:justify-self-end w-full">
+            <SignalCell label="ACTIVE NODES" value={onlineCount} icon={Server} accent="text-emerald-300" />
+            <SignalCell label="CURRENT MMR" value={user?.rating || 1200} icon={Gauge} accent="text-sky-300" />
+            <SignalCell label="WIN RATE" value={`${winRate}%`} icon={Target} accent="text-white" />
+            <SignalCell label="WIN STREAK" value={user?.current_streak || 0} icon={Flame} accent="text-amber-300" />
           </div>
         </div>
       </section>
 
-      {/* Asymmetric Core Grid */}
-      <div className="grid lg:grid-cols-12 gap-6">
-        {/* Left Column: Combat Readiness & Rating (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="rounded-2xl border border-zinc-800 bg-[#090d0a] p-6 shadow-xl space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-800/80">
+      <div className="grid xl:grid-cols-12 gap-6">
+        <div className="xl:col-span-8 space-y-6">
+          <section className="cyber-panel rounded-2xl p-6">
+            <div className="flex items-start justify-between gap-4 pb-5 border-b cyber-divider">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 block mb-0.5">
-                  ESTADO DE COMBATE
-                </span>
-                <h2 className="text-xl font-black text-white">Pasaporte Operativo</h2>
+                <div className="cyber-kicker"><Activity size={12} /> operator telemetry</div>
+                <h2 className="text-2xl font-black text-white mt-2 tracking-tight">Operational Readiness</h2>
               </div>
               <RankBadge rank={user?.rank} size="md" />
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-900">
-                <span className="text-[10px] font-black uppercase text-zinc-500 block mb-1">Rating Elo</span>
-                <div className="text-2xl font-black text-white flex items-baseline gap-1">
-                  <span>{user?.rating || 1200}</span>
-                  <span className="text-xs text-emerald-400 font-bold">MMR</span>
-                </div>
-                <div className="text-[10px] text-zinc-500 mt-1">Pico: {user?.peak_rating || 1200} MMR</div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-900">
-                <span className="text-[10px] font-black uppercase text-zinc-500 block mb-1">Win Rate</span>
-                <div className="text-2xl font-black text-white">{winRate}%</div>
-                <div className="text-[10px] text-zinc-500 mt-1">
-                  {user?.wins || 0}V - {user?.losses || 0}D
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-900">
-                <span className="text-[10px] font-black uppercase text-zinc-500 block mb-1">Racha Victorias</span>
-                <div className="text-2xl font-black text-amber-400 flex items-center gap-1">
-                  <Flame size={18} /> {user?.current_streak || 0}
-                </div>
-                <div className="text-[10px] text-zinc-500 mt-1">Mejor: {user?.best_streak || 0}</div>
-              </div>
+            <div className="grid sm:grid-cols-3 gap-3 mt-5">
+              <Metric label="ELO RATING" value={user?.rating || 1200} suffix="MMR" detail={`Peak ${user?.peak_rating || 1200}`} />
+              <Metric label="BATTLE RECORD" value={`${user?.wins || 0}-${user?.losses || 0}`} suffix="W/L" detail={`${user?.battles_played || 0} total battles`} />
+              <Metric label="CURRENT STREAK" value={user?.current_streak || 0} suffix="WINS" detail={`Best ${user?.best_streak || 0}`} amber />
             </div>
 
-            {/* Quick action to Battle */}
-            <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/[.05] flex items-center justify-between gap-4">
-              <div className="space-y-0.5">
-                <div className="text-xs font-black text-emerald-400 uppercase tracking-wider">
-                  Modo Ranked Activo
-                </div>
-                <div className="text-sm font-bold text-white">General Cybersecurity 1v1</div>
-                <div className="text-[11px] text-zinc-400">{onlineCount} analistas en línea esperando rival</div>
+            <div className="mt-5 p-4 rounded-xl border border-emerald-300/15 bg-emerald-300/[.035] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="cyber-mono text-[9px] uppercase tracking-[.16em] text-emerald-300 font-black">ranked network // online</div>
+                <div className="text-sm font-black text-white mt-1">1v1 matchmaking ready</div>
+                <div className="text-[11px] text-zinc-500 mt-0.5">Ciberseguridad · Redes · Informática Forense</div>
               </div>
               <button
                 onClick={() => onNavigate("battle")}
-                className="h-10 px-4 rounded-lg bg-emerald-400 hover:bg-emerald-300 text-black font-extrabold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                className="h-10 px-4 rounded-lg bg-emerald-300 text-black font-black text-[11px] flex items-center justify-center gap-2 hover:bg-emerald-200"
               >
-                Combatir <ArrowRight size={14} />
+                FIND OPPONENT <ArrowRight size={13} />
               </button>
             </div>
-          </div>
+          </section>
 
-          {/* Recent Battle Highlight */}
-          <div className="rounded-2xl border border-zinc-800 bg-[#090d0a] p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <History size={16} className="text-emerald-400" /> Último Enfrentamiento
-              </h3>
-              <button
-                onClick={() => onNavigate("history")}
-                className="text-xs font-bold text-zinc-500 hover:text-emerald-400 transition-colors"
-              >
-                Ver todo →
-              </button>
+          <section className="cyber-panel rounded-2xl p-6">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div>
+                <div className="cyber-kicker"><History size={12} /> latest engagement</div>
+                <h3 className="text-lg font-black text-white mt-2">Combat Log</h3>
+              </div>
+              <button onClick={() => onNavigate("history")} className="text-[10px] cyber-mono uppercase tracking-wider text-zinc-500 hover:text-emerald-300">open intel log →</button>
             </div>
 
             {recentMatch ? (
-              <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-center justify-between gap-4">
+              <div className="cyber-card rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`h-9 w-9 rounded-lg grid place-items-center font-black text-xs ${
-                      recentMatch.winner_id === user?.id
-                        ? "bg-emerald-400/10 text-emerald-400 border border-emerald-400/20"
-                        : "bg-red-500/10 text-red-400 border border-red-500/20"
-                    }`}
-                  >
+                  <div className={`h-11 w-11 rounded-xl grid place-items-center cyber-mono text-[10px] font-black border ${recentMatch.winner_id === user?.id ? "bg-emerald-300/[.08] text-emerald-300 border-emerald-300/20" : "bg-red-400/[.07] text-red-300 border-red-400/20"}`}>
                     {recentMatch.winner_id === user?.id ? "WIN" : "LOSS"}
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-white">
-                      vs {user?.id === recentMatch.player1_id ? recentMatch.p2_username : recentMatch.p1_username}
-                    </div>
-                    <div className="text-[11px] text-zinc-500">
-                      Marcador: {recentMatch.player1_score} - {recentMatch.player2_score} pts
-                    </div>
+                    <div className="text-sm font-black text-white">vs {user?.id === recentMatch.player1_id ? recentMatch.p2_username : recentMatch.p1_username}</div>
+                    <div className="cyber-mono text-[10px] text-zinc-600 mt-1">SCORE {recentMatch.player1_score} : {recentMatch.player2_score}</div>
                   </div>
                 </div>
-
-                <div className="text-right">
-                  <span className="text-[10px] text-zinc-500 uppercase block font-bold">Modalidad</span>
-                  <span className="text-xs font-bold text-zinc-300">{recentMatch.mode}</span>
+                <div className="text-left sm:text-right">
+                  <div className="cyber-mono text-[9px] text-zinc-600 uppercase tracking-wider">battle mode</div>
+                  <div className="text-xs font-bold text-zinc-300 mt-1">{recentMatch.mode}</div>
                 </div>
               </div>
             ) : (
-              <div className="p-6 rounded-xl bg-zinc-950/60 border border-zinc-900 text-center text-xs text-zinc-500">
-                Aún no has disputado batallas en esta temporada.
+              <div className="cyber-card rounded-xl p-7 text-center">
+                <Crosshair size={22} className="mx-auto text-zinc-700" />
+                <div className="text-sm font-bold text-zinc-300 mt-3">No combat telemetry yet</div>
+                <div className="text-[11px] text-zinc-600 mt-1">Enter a 1v1 battle to begin recording engagements.</div>
               </div>
             )}
-          </div>
+          </section>
         </div>
 
-        {/* Right Column: Training Tracks & Weak Topics Bridge (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          {/* Weak Topic Alert Card */}
+        <div className="xl:col-span-4 space-y-6">
           {weakestArea && (
-            <div className="rounded-2xl border border-amber-500/30 bg-amber-500/[.06] p-6 shadow-xl space-y-3">
-              <div className="flex items-center gap-2 text-xs font-black text-amber-400 uppercase tracking-wider">
-                <AlertTriangle size={15} /> Foco de Mejora Detectado
-              </div>
-              <div className="text-base font-black text-white">
-                Área técnica: {weakestArea.category}
-              </div>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Tus respuestas en combate indican una tasa de acierto del{" "}
-                {Math.round((weakestArea.correct_count / (weakestArea.total_count || 1)) * 100)}%.
-                Reforzar este módulo aumentará tus probabilidades de victoria en el ranking.
+            <section className="rounded-2xl border border-amber-300/20 bg-amber-300/[.035] p-5 shadow-xl relative overflow-hidden">
+              <div className="cyber-kicker !text-amber-300"><AlertTriangle size={12} /> vulnerability in skill profile</div>
+              <h3 className="text-lg font-black text-white mt-3">{weakestArea.category}</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed mt-2">
+                Tasa de acierto actual: {Math.round((weakestArea.correct_count / (weakestArea.total_count || 1)) * 100)}%. Refuerza este vector antes del próximo duelo.
               </p>
               <button
                 onClick={() => onPracticeTopic(weakestArea.category.toLowerCase().includes("red") ? "redes" : weakestArea.category.toLowerCase().includes("forense") ? "forense" : "ciberseguridad")}
-                className="w-full h-10 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full h-10 mt-4 rounded-lg border border-amber-300/30 bg-amber-300 text-black font-black text-[11px] flex items-center justify-center gap-2"
               >
-                <GraduationCap size={15} /> Entrenar {weakestArea.category}
+                <GraduationCap size={14} /> PATCH THIS SKILL GAP
               </button>
-            </div>
+            </section>
           )}
 
-          {/* Training Lab Tracks */}
-          <div className="rounded-2xl border border-zinc-800 bg-[#090d0a] p-6 shadow-xl space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 block mb-0.5">
-                  ESPECIALIDADES
-                </span>
-                <h3 className="text-lg font-black text-white">Training Lab</h3>
-              </div>
-              <button
-                onClick={() => onNavigate("training")}
-                className="text-xs font-bold text-emerald-400 hover:underline cursor-pointer"
-              >
-                Ver niveles →
-              </button>
+          <section className="cyber-panel rounded-2xl p-5">
+            <div className="cyber-kicker"><GraduationCap size={12} /> training modules</div>
+            <h3 className="text-xl font-black text-white mt-2">Select a discipline</h3>
+            <div className="space-y-3 mt-5">
+              {tracks.map((track) => {
+                const Icon = track.icon;
+                const color = track.accent === "cyan" ? "text-sky-300 border-sky-300/15 bg-sky-300/[.03]" : track.accent === "amber" ? "text-amber-300 border-amber-300/15 bg-amber-300/[.03]" : "text-emerald-300 border-emerald-300/15 bg-emerald-300/[.03]";
+                return (
+                  <button
+                    key={track.id}
+                    onClick={() => onPracticeTopic(track.id)}
+                    className="cyber-card w-full rounded-xl p-4 text-left flex items-center gap-4 group"
+                  >
+                    <div className={`h-11 w-11 rounded-xl border grid place-items-center ${color}`}><Icon size={19} /></div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="cyber-mono text-[8px] text-zinc-600 tracking-wider">{track.code}</span>
+                        <span className="h-px flex-1 bg-emerald-300/[.06]" />
+                      </div>
+                      <div className="text-sm font-black text-white mt-1 group-hover:text-emerald-300 transition-colors">{track.title}</div>
+                      <div className="text-[10px] text-zinc-600 mt-1 truncate">{track.sub}</div>
+                    </div>
+                    <ArrowRight size={15} className="text-zinc-700 group-hover:text-emerald-300" />
+                  </button>
+                );
+              })}
             </div>
-
-            <div className="space-y-2.5">
-              {[
-                { id: "ciberseguridad", title: "Ciberseguridad", sub: "Defensa, riesgo y ethical hacking", count: "80+ retos" },
-                { id: "redes", title: "Redes Empresariales", sub: "OSPF, BGP, L2/L3 y Troubleshooting", count: "100+ retos" },
-                { id: "forense", title: "Informática Forense", sub: "Evidencia digital, RAM y normas ISO", count: "90+ retos" },
-              ].map((track) => (
-                <div
-                  key={track.id}
-                  onClick={() => onPracticeTopic(track.id)}
-                  className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/80 hover:border-zinc-700 transition-colors flex items-center justify-between cursor-pointer group"
-                >
-                  <div>
-                    <h4 className="text-xs font-black text-white group-hover:text-emerald-400 transition-colors">
-                      {track.title}
-                    </h4>
-                    <p className="text-[11px] text-zinc-500 mt-0.5">{track.sub}</p>
-                  </div>
-                  <span className="text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-1 rounded shrink-0">
-                    {track.count}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          </section>
         </div>
       </div>
+    </div>
+  );
+}
+
+function SignalCell({ label, value, icon: Icon, accent }) {
+  return (
+    <div className="rounded-xl border border-emerald-300/[.09] bg-black/25 p-4 backdrop-blur-sm">
+      <div className="flex items-center justify-between gap-2">
+        <span className="cyber-mono text-[8px] uppercase tracking-[.14em] text-zinc-600">{label}</span>
+        <Icon size={13} className={accent} />
+      </div>
+      <div className={`text-2xl font-black mt-3 ${accent}`}>{value}</div>
+    </div>
+  );
+}
+
+function Metric({ label, value, suffix, detail, amber = false }) {
+  return (
+    <div className="cyber-card rounded-xl p-4">
+      <div className="cyber-mono text-[8px] uppercase tracking-[.15em] text-zinc-600">{label}</div>
+      <div className={`text-2xl font-black mt-2 ${amber ? "text-amber-300" : "text-white"}`}>
+        {value} <span className="text-[9px] text-emerald-300 cyber-mono">{suffix}</span>
+      </div>
+      <div className="text-[10px] text-zinc-600 mt-1.5">{detail}</div>
     </div>
   );
 }

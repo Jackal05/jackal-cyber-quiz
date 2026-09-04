@@ -15,7 +15,6 @@ import ProfileView from "./components/profile/ProfileView.jsx";
 function AppContent() {
   const { showAuthModal, setShowAuthModal } = useAuth();
 
-  // URL Hash Sync for clean SPA navigation
   const getRouteFromHash = () => {
     const hash = window.location.hash.replace("#/", "").replace("#", "").toLowerCase();
     if (["dashboard", "training", "battle", "leaderboard", "history", "profile"].includes(hash)) {
@@ -28,9 +27,7 @@ function AppContent() {
   const [trainingCategory, setTrainingCategory] = useState("ciberseguridad");
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentRoute(getRouteFromHash());
-    };
+    const handleHashChange = () => setCurrentRoute(getRouteFromHash());
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
@@ -47,27 +44,19 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050806] text-zinc-100 selection:bg-emerald-400 selection:text-black flex flex-col justify-between">
-      {/* Background Matrix/Grid Aesthetic */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-25"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(34,197,94,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,.03) 1px,transparent 1px)",
-          backgroundSize: "44px 44px",
-        }}
-      />
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 h-80 w-3/4 bg-emerald-500/[0.07] blur-[140px] pointer-events-none" />
+    <div className="min-h-screen text-zinc-100 selection:bg-emerald-300 selection:text-black flex flex-col justify-between relative isolate">
+      <div className="fixed inset-x-0 top-0 h-[26rem] pointer-events-none -z-10 overflow-hidden">
+        <div className="absolute left-[7%] top-[-10rem] h-[24rem] w-[24rem] rounded-full bg-emerald-400/[.075] blur-[110px]" />
+        <div className="absolute right-[6%] top-[-8rem] h-[22rem] w-[22rem] rounded-full bg-sky-400/[.045] blur-[120px]" />
+      </div>
 
-      {/* Navigation */}
       <Navbar
         currentRoute={currentRoute}
         onRouteChange={navigateTo}
         onOpenAuthModal={() => setShowAuthModal(true)}
       />
 
-      {/* Main View Container */}
-      <main className="relative z-10 flex-1 px-4 sm:px-6 py-8 md:py-12">
+      <main className="relative z-10 flex-1 px-4 sm:px-6 py-7 md:py-10">
         {currentRoute === "dashboard" && (
           <DashboardView onNavigate={navigateTo} onPracticeTopic={handlePracticeTopic} />
         )}
@@ -95,10 +84,7 @@ function AppContent() {
         )}
       </main>
 
-      {/* Footer */}
       <Footer onNavigate={navigateTo} />
-
-      {/* Auth / Identity Modal */}
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
