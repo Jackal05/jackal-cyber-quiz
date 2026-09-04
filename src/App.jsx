@@ -11,15 +11,14 @@ import TrainingSection from "./components/training/TrainingSection.jsx";
 import LeaderboardView from "./components/leaderboard/LeaderboardView.jsx";
 import BattleHistoryView from "./components/history/BattleHistoryView.jsx";
 import ProfileView from "./components/profile/ProfileView.jsx";
-import AdminGeneratorView from "./views/AdminGeneratorView.jsx";
 
 function AppContent() {
   const { showAuthModal, setShowAuthModal } = useAuth();
-  
+
   // URL Hash Sync for clean SPA navigation
   const getRouteFromHash = () => {
     const hash = window.location.hash.replace("#/", "").replace("#", "").toLowerCase();
-    if (["dashboard", "training", "battle", "leaderboard", "history", "profile", "engine"].includes(hash)) {
+    if (["dashboard", "training", "battle", "leaderboard", "history", "profile"].includes(hash)) {
       return hash;
     }
     return "dashboard";
@@ -94,8 +93,6 @@ function AppContent() {
         {currentRoute === "profile" && (
           <ProfileView onOpenAuthModal={() => setShowAuthModal(true)} />
         )}
-
-        {currentRoute === "engine" && <AdminGeneratorView />}
       </main>
 
       {/* Footer */}
