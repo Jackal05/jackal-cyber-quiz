@@ -9,11 +9,8 @@ import {
   GraduationCap,
   Trophy,
   History,
-  User,
   Menu,
   X,
-  Radio,
-  Cpu,
 } from "lucide-react";
 
 export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal }) {
@@ -25,7 +22,6 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "training", label: "Training", icon: GraduationCap },
     { id: "battle", label: "Battle 1v1", icon: Swords, badge: "LIVE" },
-    { id: "engine", label: "Engine AI", icon: Cpu, badge: "AI" },
     { id: "leaderboard", label: "Leaderboard", icon: Trophy },
     { id: "history", label: "Battle History", icon: History },
   ];
@@ -38,7 +34,6 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-[#050806]/85 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
-        {/* Brand Logo */}
         <button
           onClick={() => handleNavClick("dashboard")}
           className="flex items-center gap-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-xl"
@@ -59,7 +54,6 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
           </div>
         </button>
 
-        {/* Desktop Nav Items */}
         <nav className="hidden md:flex items-center gap-1">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -89,9 +83,7 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
           })}
         </nav>
 
-        {/* Right Section: Online count & Profile chip */}
         <div className="flex items-center gap-3">
-          {/* Online count */}
           <div
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-zinc-800/80 bg-zinc-950/60 text-[11px] text-zinc-400 font-semibold"
             title="Analistas conectados en tiempo real"
@@ -103,7 +95,6 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
             <span>{onlineCount} online</span>
           </div>
 
-          {/* Profile chip */}
           {user ? (
             <button
               onClick={() => handleNavClick("profile")}
@@ -131,7 +122,6 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
             </button>
           )}
 
-          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-900"
@@ -142,7 +132,6 @@ export default function Navbar({ currentRoute, onRouteChange, onOpenAuthModal })
         </div>
       </div>
 
-      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-b border-zinc-800 bg-[#070b08] px-4 py-4 space-y-1 animate-in slide-in-from-top-2">
           {navItems.map((item) => {
