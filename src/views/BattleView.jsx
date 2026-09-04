@@ -21,19 +21,15 @@ export default function BattleView({ onViewHistory, onViewLeaderboard, onPractic
     rematchOffered,
   } = useBattleSocket();
 
-  // If in matchmaking queue
   if (isInQueue) {
     return <MatchmakingScreen onCancel={cancelQueue} />;
   }
 
-  // If inside an active match
   if (match) {
     return (
       <div className="relative">
         {match.state === "COUNTDOWN" && <VsScreen match={match} />}
-
         {match.state === "ROUND_ACTIVE" && <BattleArena />}
-
         {match.state === "ROUND_RESULT" && <RoundResultScreen match={match} />}
 
         {(match.state === "MATCH_FINISHED" || match.state === "FORFEIT") && (
@@ -41,15 +37,15 @@ export default function BattleView({ onViewHistory, onViewLeaderboard, onPractic
             match={match}
             onRematch={requestRematch}
             onFindNewOpponent={() => {
+              const previousMode = match.mode || "ciberseguridad";
               resetBattle();
-              joinQueue("general");
+              joinQueue(previousMode);
             }}
             onBackToLobby={resetBattle}
             onPracticeTopic={onPracticeTopic}
           />
         )}
 
-        {/* Rematch Modal if received */}
         {rematchOffered && (
           <RematchModal
             rematchOffered={rematchOffered}
@@ -61,7 +57,6 @@ export default function BattleView({ onViewHistory, onViewLeaderboard, onPractic
     );
   }
 
-  // Default: Battle Lobby
   return (
     <BattleLobby
       onFindOpponent={(mode) => joinQueue(mode)}
